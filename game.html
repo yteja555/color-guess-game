@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .square
+{   width: 26%;
+   padding-bottom: 26%;
+   margin:1.6%;
+   float: left;
+   border-radius: 20%;
+   border:2px solid black;
+   
+}
+.containerSquares
+{
+    width: 55%;
+    margin:0 auto;
+}
+
+
+.header
+{
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    color: black;
+}
+.valueDisplay
+{
+    display: block;
+}
+.mode
+{
+    float: right;
+}
+
+.prog
+{
+    height: 100%;
+}
+.img-responsive
+{
+    margin: 0 auto;
+}
+    </style>
+    <link href="https://fonts.googleapis.com/css?family=Orbitron&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    
+    <title>Document</title>
+</head>
+<body>
+
+    
+    <div class="header bg-info">
+        <h1>RGB COLOR GUESS GAME</h1>
+    </div>
+   
+    <div class=" container buttonsArea justify-content-around ">
+        <div class="btn btn-outline-info text-btn-outline-info btn-sm" id="reset" >NEW COLORS</div>
+        <div class="btn btn-outline-info text-btn-outline-info btn-sm" id="hint" >HINT</div>
+        <div class="mode btn btn-outline-info text-btn-outline-info active ml-3 btn-sm" id="hard">HARD</div>
+        <div class="mode btn btn-outline-info text-btn-outline-info btn-sm"  id="easy">EASY</div>
+    </div>
+    <div class="container">
+        <div id="status" class="text-center mt-5 "></div>
+        
+    </div>
+    <img src="https://www.teachengineering.org/content/spfun_/maker_challenges/spfun_rgbcolor_maker1_image1.png" alt="rgb hint" class=".img-responsive" width="25%" style="display: none; margin: 0 auto;" id="rgb-img"  >
+    <div class="container mt-5 ">
+      <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated redProg prog">
+        </div>
+        <div class="progress-bar progress-bar-striped progress-bar-animated prog greenProg" >
+        </div>
+        <div class="progress-bar progress-bar-striped progress-bar-animated prog blueProg ">
+        </div>
+      </div>
+      <!-- <div id="piechart"></div> -->
+  </div >
+    <div class="containerSquares mt-5">
+    </div>
+    
+    <script >
+    $(function()
+    {
+    let gameStarted
+    let containerSquares;
+    let squares;
+    let header;
+    let colors;
+    let reset=document.getElementById("reset");
+    reset.addEventListener("click",resetGame)
+    let pickedColor;
+    let status;
+    let gameOver;
+    let easy=document.getElementById("easy");
+    easy.addEventListener("click",setEasy);
+    let hard=document.getElementById("hard");
+    hard.addEventListener("click",setHard);
+    let hardMode=true;
+    let progressBars;
+    let hint=document.getElementById("hint");
+    hint.addEventListener("click",giveHint);
+    let hintShown=false;
+    initialize(hardMode);
+    function initialize(isHard)
+    {   gameStarted=false;
+    	let size;
+    	if(isHard)
+    	{
+    		size=6;
+    	}
+    	else
+    	{
+    		size=3;
+    	}
+    	containerSquares=document.querySelector(".containerSquares");
+    	console.log("calling addtiles ",size);
+    	//adding tiles
+    	addTiles(size);
+    	console.log("completed addtiles ",size);
+    	squares  =  document.querySelectorAll('.square');
+    	//setting random colors
+    	setRandomColors(size);
+    
+        //picking a color
+        progressBars=document.querySelectorAll(".prog");
+    	pickedColor=pickAColor(size);
+    	console.log("picked color=",pickedColor);
+        let splittedColors=pickedColor.split(",");
+        console.log(splittedColors[0].slice(4));
+        console.log(splittedColors[1].slice(1));
+        console.log(splittedColors[2].slice(1,-1));
+        let r=Number(splittedColors[0].slice(4))/255*33;
+        let g=Number(splittedColors[1].slice(1))/255*33;
+        let b=Number(splittedColors[2].slice(1,-1))/255*33;
+        console.log(r,g,b);
+        progressBars[0].style.width=0+"%";
+        progressBars[1].style.width=0+"%";
+        progressBars[2].style.width=0+"%";
+        // $(".bg-danger").animate({"width":0+"%"});
+        // $(".bg-success").delay(r*50).animate({"width":0+"%"});
+        // $(".blueProg").delay((r*50)+(g*50)).animate({"width":0+"%"});
+        $(".redProg").css("backgroundColor","red")
+        $(".greenProg").css("backgroundColor","green")
+        $(".blueProg").css("backgroundColor","blue")
+        $(".redProg").animate({"width":r+"%"});
+        $(".greenProg").animate({"width":g+"%"});
+        $(".blueProg").animate({"width":b+"%"});
+
+    	// google.charts.load('current', {'packages':['corechart']});
+        // google.charts.setOnLoadCallback(drawChart);
+    
+    // Draw the chart and set the chart values
+    //     function drawChart() {
+    //     var data = google.visualization.arrayToDataTable([
+    //    ['color', 'percentage'],
+    //    ['Red', r],
+    //    ['Green', g],
+    //    ['Blue', b]
+    //    ]);
+   
+    //   // Optional; add a title and set the width and height of the chart
+    //   var options = {'title':'RGB', 'width':550, 'height':400,colors:['red','green','blue'],animation:{
+    //     duration: 1000,
+    //     easing: 'out',
+    //   }};
+  
+    //   // Display the chart inside the <div> element with id="piechart"
+    //   var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+    //   chart.draw(data, options);
+    // }
+        //displaying picked color
+        
+    
+    	reset=document.getElementById("reset");
+    	reset.textContent="NEW COLORS";
+    	status=document.getElementById("status");
+    	status.textContent="guess the color formed due to following amounts of red green blue";
+    	easy=document.getElementById("easy");
+    	hard=document.getElementById("hard");
+    }
+    function addTiles(size)
+    {
+        containerSquares.innerHTML="";
+        for(let i=0;i<size;i++)
+        {
+            let tile=document.createElement("div");
+            tile.classList.add("square");
+            tile.id="square"+i;
+            containerSquares.appendChild(tile)
+        }
+    }
+    
+    // function that sets random colors to tiles
+    function setRandomColors(size)
+    {
+        //squares =  document.querySelectorAll('.square');
+        console.log("tiles size=",size);
+        colors=[];
+        for(let i=0;i<size;i++)
+        {
+             r=Math.round(Math.random()*255);
+             g=Math.round(Math.random()*255);
+             b=Math.round(Math.random()*255);
+             console.log(squares[i]);
+             squares[i].style.backgroundColor="rgb("+r+", "+g+", "+b+")";
+             squares[i].addEventListener("click",colorClick);
+             colors.push(squares[i].style.backgroundColor);
+             console.log(r,g,b)
+        
+        }
+    }
+    
+    // function to pick a random color from random colors
+    function pickAColor(size)
+    {
+        console.log(colors);
+        let pick=Math.round(Math.random()*(size-1));
+        console.log("picked numer=",pick);
+        // return "rgb(255, 255, 255)";
+        return colors[pick];
+    }
+    
+    //funtion that needd to be called when clicked on a tile
+    function colorClick()
+    {
+        console.log(this);
+        console.log(this.style.backgroundColor,pickedColor)
+        gameStarted=true;
+        reset.innerHTML="New Game";
+        if(this.style.backgroundColor==pickedColor)
+        {
+            
+            status.textContent="Correct";
+            
+            reset.style.display+"none";
+            console.log('reset');
+            setSameColor();
+            $(".redProg").css("backgroundColor",pickedColor)
+            $(".greenProg").css("backgroundColor",pickedColor)
+            $(".blueProg").css("backgroundColor",pickedColor)
+            $(".redProg").css("width","33%")
+            $(".greenProg").css("width","33%")
+            $(".blueProg").css("width","34%")
+            gameStarted=false;
+            
+        
+        }
+        else
+        {
+            status.textContent="try again *";
+            $("#"+this.id).fadeTo(800,0)
+            // this.style.backgroundColor="white";
+            this.style.border="2px solid white";
+            console.log("#"+this.id)
+            console.log("working")
+
+            console.log($("#"+this.id))
+        }
+    }
+    
+    
+    //set same color after winning
+    function setSameColor()
+    {
+        for(let i=0;i<squares.length;i++)
+        {
+             squares[i].style.backgroundColor=pickedColor;
+             squares[i].style.border="2px solid black";
+             $("#"+squares[i].id).css("opacity","0")
+             $("#"+squares[i].id).fadeTo(800,1.0)
+        
+        }
+    }
+    
+    function setEasy()
+    {
+        if(!gameStarted && hardMode )
+        {
+        easy.classList.add("active");
+        hard.classList.remove("active");
+        hardMode=false;
+        initialize(hardMode);
+        }
+    }
+    function setHard()
+    {
+        if(!gameStarted && !hardMode)
+        {
+            easy.classList.remove("active");
+        hard.classList.add("active");
+        hardMode=true;
+        initialize(hardMode);
+        }
+    }
+
+    function resetGame()
+    {
+        initialize(hardMode);
+    }
+
+    function giveHint()
+    {
+        if(!hintShown)
+        {
+            this.classList.add("active")
+            hintShown="true";
+            console.log("image-",hintShown)
+            $("#rgb-img").show();
+            $("#rgb-img").css("display","block");
+
+        }
+        else
+        {
+            this.classList.remove("active");
+            hintShown=false;
+            console.log("image-",hintShown)
+            $("#rgb-img").hide();
+
+
+        }
+        
+    }
+
+
+
+
+});
+    </script>
+</body>
+</html>
