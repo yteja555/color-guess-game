@@ -19,7 +19,12 @@
     margin:0 auto;
 }
 
-
+.gameEnded{
+    position:absolute;
+    top: 300px;
+    width: 30%;
+    left: 35%;
+}
 .header
 {
     font-family: 'Orbitron', sans-serif;
@@ -90,8 +95,9 @@
         </div>
       </div>
       <!-- <div id="piechart"></div> -->
-
-    <div class="container gameEnded text-center text-danger  border border-danger" style="position: absolute; top:300px;">GameEnded</div>
+      <div class="text-center">
+          <div class="gameEnded border border-danger  text-danger "> Game Ended </div>
+        </div>
   </div >
     <div class="containerSquares mt-5">
     </div>
@@ -133,6 +139,7 @@
             $(".containerSquares").show();
             console.log("checking here")
             $(".gameEnded").css("top","300px");
+            $(".gameEnded").css("left","35%");
             $(".gameEnded").hide(0);
             lifesLabel.innerHTML='<i class="fas fa-heart text-danger" id="lifes1"></i> <i class="fas fa-heart text-danger" id="lifes2"></i> <i class="fas fa-heart text-danger" id="lifes3"></i>';
             gameStarted=false;
@@ -316,6 +323,7 @@
                 {
                     $(".gameEnded").css("display","block")
                     $(".gameEnded").animate({"top":"500px"},1000)
+                    $(".gameEnded").show();
                     $(".containerSquares").hide(0);
                     $(".redProg").css("backgroundColor",pickedColor)
                 $(".greenProg").css("backgroundColor",pickedColor)
