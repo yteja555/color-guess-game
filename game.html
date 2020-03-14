@@ -48,6 +48,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-1.12.3.min.js" integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://kit.fontawesome.com/2f3a7c8d85.js" crossorigin="anonymous"></script>
 
     
     <title>Document</title>
@@ -66,14 +67,16 @@
         <div class="mode btn btn-outline-info text-btn-outline-info btn-sm"  id="easy">EASY</div>
     </div>
     <div class="container">
-        <div id="status" class="text-center mt-5 "></div>
+        <div id="status" class="text-center mt-5 text-dark  mb-5">guess the color formed due to following amounts of red, green, blue</div>
     <!-- adding scores lifes etc. -->
-    <div class="container row justify-content-around"> 
-        <!-- lifes -->
-        <div col-md-3 col-sm-6 id="lifes"> No of Chances:</div>
-        <div col-md-3 col-sm-6 id="highscore">high Score:</div>
-        <div col-md-3 col-sm-6 id="colorsToGuess">Colors to guess:</div>
-        <div col-md-3 col-sm-6 id="score">Score:</div>
+    <div class=" row justify-content-between"> 
+       
+        
+        <div class="container"></div>
+        <div class="col-sm-4 text-warning text-center"><div>HIGH SCORE <i class="fas fa-trophy text-warning"></i></div> <div  id="highscore"  ></div></div>
+         <!-- lifes -->
+         <div class="col-sm-4 text-danger text-center"><div>LIFES</div> <div  id="lifes"></div></div>
+        <div class="col-sm-4 text text-success text-center"><div>SCORE <i class="fas fa-trophy  text-success"></i></div> <div  id="score"></div></div>
     </div>
     </div>
     <img src="https://www.teachengineering.org/content/spfun_/maker_challenges/spfun_rgbcolor_maker1_image1.png" alt="rgb hint" class=".img-responsive" width="25%" style="display: none; margin: 0 auto;" id="rgb-img"  >
@@ -88,7 +91,7 @@
       </div>
       <!-- <div id="piechart"></div> -->
 
-    <div class="container gameEnded text-center" style="position: absolute;">GameEnded</div>
+    <div class="container gameEnded text-center text-danger  border border-danger" style="position: absolute; top:300px;">GameEnded</div>
   </div >
     <div class="containerSquares mt-5">
     </div>
@@ -96,13 +99,12 @@
     <script >
     $(function()
     {
+        
         let gameEnded="false"
         let highScoreLabel=document.getElementById("highscore");
         let highScore=0;
         let lifesLabel=document.getElementById("lifes");
         let lifes;
-        let colorsToGuessLabel=document.getElementById("colorsToGuess");
-        let colorsToGuess;
         let scoreLabel=document.getElementById("score");
         let score;
 
@@ -130,9 +132,9 @@
         {   
             $(".containerSquares").show();
             console.log("checking here")
-            $(".gameEnded").css("top","200px");
+            $(".gameEnded").css("top","300px");
             $(".gameEnded").hide(0);
-
+            lifesLabel.innerHTML='<i class="fas fa-heart text-danger" id="lifes1"></i> <i class="fas fa-heart text-danger" id="lifes2"></i> <i class="fas fa-heart text-danger" id="lifes3"></i>';
             gameStarted=false;
             gameEnded=false;
         	let size;
@@ -207,18 +209,16 @@
         	reset=document.getElementById("reset");
         	reset.textContent="NEW COLORS";
         	status=document.getElementById("status");
-        	status.textContent="guess the color formed due to following amounts of red green blue";
+            status.style.opacity="1"
         	easy=document.getElementById("easy");
             hard=document.getElementById("hard");
             
 
-            colorsToGuess=10;
-            lifes=3;
+            lifes=4;
             score=0;
             updateHighScore();
             updateLifes();
             updateScore();
-            updateColorsToGuess();
         }
         function addTiles(size)
         {
@@ -268,12 +268,10 @@
             console.log(this);
             console.log(this.style.backgroundColor,pickedColor)
             gameStarted=true;
+            status.style.opacity="0"
             reset.innerHTML="New Game";
-            if(this.style.backgroundColor==pickedColor)
+            if(this.style.backgroundColor==pickedColor )
             {
-
-                status.textContent="Correct";
-
                 reset.style.display+"none";
                 console.log('reset');
                 setSameColor();
@@ -291,13 +289,11 @@
                 updateScore();
                 highScore=Math.max(highScore,score);
                 updateHighScore();
-                colorsToGuess-=1;
-                updateColorsToGuess();
-                if(colorsToGuess>0 && lifes>0)
+                if(lifes>0)
                 {
                     getNextColor();
                 }
-                if(lifes==0 || colorsToGuess==0)
+                if(lifes==1 )
                 {
 
                     initialize(hardMode);
@@ -305,20 +301,35 @@
                 },800)
             
             }
-            else
+            else if(this.style.backgroundColor!="white")
             {
-                status.textContent="try again *";
+                
                 $("#"+this.id).fadeTo(800,0)
+                this.style.backgroundColor="white";
                 // this.style.backgroundColor="white";
+
                 this.style.border="2px solid white";
+                
                 lifes-=1
                 updateLifes();
-                if(lifes==0 || colorsToGuess==0)
+                if(lifes==1 )
                 {
                     $(".gameEnded").css("display","block")
                     $(".gameEnded").animate({"top":"500px"},1000)
                     $(".containerSquares").hide(0);
-                    status.textContent="";
+                    $(".redProg").css("backgroundColor",pickedColor)
+                $(".greenProg").css("backgroundColor",pickedColor)
+                $(".blueProg").css("backgroundColor",pickedColor)
+                $(".redProg").css("width","33%")
+                $(".greenProg").css("width","33%")
+                $(".blueProg").css("width","34%")
+                    lifesLabel.innerHTML="0"
+                    if(hintShown)
+                    {
+                        $("#rgb-img").hide();
+                        hint.classList.remove("active");
+                        hintShown=false;
+                    }
                 }
 
             }
@@ -389,22 +400,21 @@
         }
         function updateScore()
         {
-            scoreLabel.innerHTML="Score: "+score;
+            scoreLabel.innerHTML=" "+score;
         }
         function updateLifes()
         {
-            lifesLabel.innerHTML="No of chances: "+lifes;
+            if(lifes<4)
+            {
+            $("#lifes"+lifes).slideUp(800);
+            }
         }
 
-        function updateColorsToGuess()
-        {
-
-            colorsToGuessLabel.innerHTML="Colors to guess: "+colorsToGuess;
-        }
+        
 
         function updateHighScore()
         {
-            highScoreLabel.innerHTML="HighScore: "+highScore;
+            highScoreLabel.innerHTML='' +highScore;
         }
         
         function getNextColor()
